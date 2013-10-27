@@ -13,6 +13,8 @@ This will be improved as far as it is necessary.
 import time
 import RPi.GPIO as GPIO
 
+import lib.font
+
 class DOG():
     """
     """
@@ -103,3 +105,10 @@ class DOG():
         """
         for i in seq:
             self.send_data(i)
+
+    def send_text(self, text):
+        for char in text:
+            data = ord(char)
+            if not lib.font.tempesta.has_key(data):
+                data = 0x20
+            self.send_data_seq(lib.font.tempesta[data][0])
