@@ -13,6 +13,8 @@ This will be improved as far as it is necessary.
 import time
 import RPi.GPIO as GPIO
 
+import lib.font
+
 class DOG():
     """
     """
@@ -103,3 +105,37 @@ class DOG():
         """
         for i in seq:
             self.send_data(i)
+
+    def send_text(self, text):
+        """
+        """
+        font = lib.font.tempesta
+        for char in text:
+            data = ord(char)
+            if not font.has_key(data):
+                data = 0x20
+            self.send_data_seq(font[data][0])
+
+    def print_text(self, text, line, align='left'):
+        """
+        """
+        font = lib.font.tempesta
+        length = 0
+        for char in text:
+            data = ord(char)
+            if not font.has_key(data):
+                data = 0x20
+            length += font[data][1]
+
+        if length > 128:
+            raise RuntimeError
+
+        if align == 'left':
+            self.set_pos(line, 0)
+            self.send_text(text)
+        elif align == 'right':
+            self.set_pos(line, 128 - length)
+            self.send_text(text)
+        elif align == 'center':
+            self.set_pos(line, (128 - length) / 2)
+            self.send_text(text)
