@@ -18,9 +18,12 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, GPIO.cleanup)
     lcd = DOG(16, 18, 22, 26, 24)
 
-    lcd.print_text('FOOBAR', 1, 'center')
-    lcd.print_text('THIS IS WORKING', 2, 'left')
-    lcd.print_text('BY MISCHBACK', 3, 'right')
+    lcd.print_text('This is working...', 1, 'left')
+    lcd.print_text('by Mischback', 2, 'right')
+    lcd.print_text('ABCDEFGHIJKLMNO', 3, 'left')
+    lcd.print_text('PQRSTUVWXYZ', 4, 'left')
+    lcd.print_text('abcdefghijklmno', 5, 'right')
+    lcd.print_text('pqrstuvwxyz', 6, 'right')
 
     while True:
         pass
