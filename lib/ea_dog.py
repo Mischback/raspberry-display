@@ -10,10 +10,12 @@ Most of this code was taken from "atlasz"@raspberrypiforums.com (http://www.rasp
 This will be improved as far as it is necessary.
 """
 
+import sys
 import time
 import RPi.GPIO as GPIO
 
 import lib.font
+from lib.image_processor import BitmapProcessor
 
 class DOG():
     """
@@ -27,6 +29,11 @@ class DOG():
         self.a0 = a0
         self.cs = cs
         self.res = res
+
+        self.bitmap_processor = None
+        self.display_width = 128
+        self.display_height = 64
+        self.color_depth = 1
 
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.si, GPIO.OUT)
@@ -139,3 +146,26 @@ class DOG():
         elif align == 'center':
             self.set_pos(line, (128 - length) / 2)
             self.send_text(text)
+
+    def show_image(self, filename):
+        if not self.bitmap_processor:
+            self.bitmap_processor = BitmapProcessor(self.display_width, self.display_height, self.color_depth, 0)
+
+        try:
+            img_lines = self.bitmap_processor.process_image(filename)
+        except ImageProcessorException, e:
+            print 'Exception:', e
+
+        for line in range(8):
+            seq = []
+            for i in range(16):
+                for j in range(8):
+                    mask = pow(2, 7 - j)
+                    byte = 0
+                    for k in range(8):
+                        bit = ord(img_lines[line * 8 + k][i]) & mask
+                        if bit:
+                            byte += pow(2, k)
+                    seq.append(byte)
+            self.set_pos(line, 0)
+            self.send_data_seq(seq)
