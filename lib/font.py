@@ -1,7 +1,14 @@
 #!/usr/bin/python
 # coding: utf-8
 
+"""
+@file   font.py
+@brief  Contains the usable fonts for the display
+"""
 
+
+# font PF Tempesta, all characters are 7 pixels tall
+# @todo: some characters still missing, but it is soo dull
 tempesta = {
     0x20: ([0x00, 0x00], 2),
     0x21: ([0xBE, 0x00], 2), # !
