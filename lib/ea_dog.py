@@ -47,6 +47,7 @@ class DOGM128():
         self.display_width = 128
         self.display_height = 64
         self.color_depth = 1
+        self.ctrl_pages = 64 / 8
 
         # setup GPIO
         GPIO.setmode(GPIO.BOARD)
@@ -74,7 +75,7 @@ class DOGM128():
         """
         @brief  Clears the display, removes all existing pixels
         """
-        for i in range(8):
+        for i in range(self.ctrl_pages):
             self.set_pos(i, 0)
             self.send_data_seq([0x00] * 128)
 
@@ -172,16 +173,16 @@ class DOGM128():
                 data = 0x20
             length += font[data][1]
 
-        if length > 128:
+        if length > self.display_width:
             # @todo Handle this a little more clever than this...
             raise RuntimeError('Text is too long')
 
         if align == 'left':
             self.set_pos(line, 0)
         elif align == 'right':
-            self.set_pos(line, 128 - length)
+            self.set_pos(line, self.display_width - length)
         elif align == 'center':
-            self.set_pos(line, (128 - length) / 2)
+            self.set_pos(line, (self.display_width - length) / 2)
         self.send_text(text)
 
     def show_image(self, filename):
@@ -192,7 +193,7 @@ class DOGM128():
         The file must be a bitmap image with color depth of 1 (means: black and
         white) and must not exceed the dimensions of the display.
 
-        The BitmapProcessor will return the image data linewhise. This function
+        The BitmapProcessor will return the image data linewise. This function
         will translate this to display-data. It will take 8 lines of the image
         data, iterate the bits and calculate the needed data bytes.
         """
@@ -207,7 +208,7 @@ class DOGM128():
             # @todo: Handle this a little more clever than this...
             print 'Exception:', e
 
-        for line in range(8):
+        for line in range(self.ctrl_pages):
             seq = []
             for i in range(16):
                 for j in range(8):
